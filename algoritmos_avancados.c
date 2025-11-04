@@ -1,4 +1,20 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct No
+{
+    char valor[50];
+    struct No *esquerda;
+    struct No *direita;
+} No;
+
+// --- Protótipos ---
+No *criarSala(char *valor);
+void liberar(No *raiz);
+void explorarSalas(No *raiz);
+void limpaBuffer();
+void exibeSalas(No *raiz);
 
 // Desafio Detective Quest
 // Tema 4 - Árvores e Tabela Hash
@@ -6,6 +22,13 @@
 // Use as instruções de cada região para desenvolver o sistema completo com árvore binária, árvore de busca e tabela hash.
 
 int main() {
+     No *raiz = criarSala("Hall de Entrada");
+    raiz->esquerda = criarSala("Sala de Estar");
+    raiz->direita = criarSala("Biblioteca");
+    raiz->esquerda->esquerda = criarSala("Quarto");
+    raiz->direita->direita = criarSala("Cozinha");
+    explorarSalas(raiz);
+    liberar(raiz);
 
     // 🌱 Nível Novato: Mapa da Mansão com Árvore Binária
     //
@@ -43,5 +66,98 @@ int main() {
     // - Modularize com funções como inicializarHash(), buscarSuspeito(), listarAssociacoes().
 
     return 0;
+}
+No *criarSala(char *valor) // cria sala
+{
+    No *novo = (No *)malloc(sizeof(No));
+    if (novo == NULL) // verifica se a alocação deu certo
+    {
+        printf("Erro na alocação de memória!\n");
+        return NULL;
+    }
+    strcpy(novo->valor, valor);
+    novo->esquerda = NULL;
+    novo->direita = NULL;
+    return novo;
+}
+
+void liberar(No *raiz) // libera filho esquerdo , direito , raiz memmoria alocada para arvore
+{
+    if (raiz != NULL)
+    {
+        liberar(raiz->esquerda);
+        liberar(raiz->direita);
+        free(raiz);
+    }
+};
+
+void explorarSalas(No *raiz) // exibe caminho escolhido: esquerda, direita ou sair
+{
+
+    int opcao;
+    No *salaAtual = raiz;
+    do
+    {
+        exibeSalas(salaAtual);
+        printf("\nPara que sala voce irá ?: \n");
+        printf("1 - Esquerda\n");
+        printf("2 - Direita\n");
+        printf("0 - Sair\n");
+
+        scanf("%d", &opcao);
+        limpaBuffer();
+
+        switch (opcao)
+        {
+        case 1: // vai para esquerda
+            if (salaAtual->esquerda != NULL)
+            {
+                salaAtual = salaAtual->esquerda;
+            }
+            else
+            {
+                printf("Não há sala à esquerda!\n");
+            }
+            break;
+
+        case 2: // vai para direita
+            if (salaAtual->direita != NULL)
+            {
+                salaAtual = salaAtual->direita;
+            }
+            else
+            {
+                printf("Não há sala à direita!\n");
+            }
+            break;
+
+        case 0: // Sair
+            printf("Saindo do jogo...\n");
+            break;
+
+        default:
+            printf("Opção inválida! Tente novamente.\n");
+            break;
+        }
+
+    } while (opcao != 0);
+};
+
+void limpaBuffer() // Limpa buffer de entrada
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+};
+
+void exibeSalas(No *raiz)
+{
+    if (raiz != NULL)
+    {
+        printf("Sala vazia ! ");
+    }
+    printf("Sala Atual: %s ", raiz->valor);
+    printf("Sala Esquerda: %s ", raiz->esquerda->valor);
+    printf("Sala Direita: %s ", raiz->direita->valor);
 }
 
